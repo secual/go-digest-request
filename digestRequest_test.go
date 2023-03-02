@@ -2,7 +2,7 @@ package digestRequest
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -40,7 +40,7 @@ func testRequest(h http.HandlerFunc, setClient func(context.Context) context.Con
 		return errors.Errorf("error status code: %s", resp.Status)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return errors.Wrap(err, "error in ReadAll")
 	}
