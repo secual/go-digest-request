@@ -57,7 +57,7 @@ const realm = "realm"
 const wwwAuthenticate = "Www-Authenticate"
 const authorization = "Authorization"
 
-var wanted = []string{nonce, qop, realm}
+var wanted = []string{algorithm, nonce, opaque, qop, realm}
 
 // New makes a DigestRequest instance
 func New(ctx context.Context, username, password string) *DigestRequest {
@@ -116,16 +116,12 @@ func (r *DigestRequest) makeParts(req *http.Request) (map[string]string, error) 
 
 			if strings.Contains(r, w) {
 
-				kv := strings.Split(r, "=")
+				kv := strings.Split(r, `=`)
 				if len(kv) > 1 {
 					parts[w] = strings.Trim(kv[1], `"`)
 				}
 			}
 		}
-	}
-
-	if len(parts) != len(wanted) {
-		return nil, fmt.Errorf("header is invalid: %+v", parts)
 	}
 
 	aval, ok := parts[algorithm]
@@ -138,6 +134,16 @@ func (r *DigestRequest) makeParts(req *http.Request) (map[string]string, error) 
 	} else {
 		fmt.Printf("no algorithm(use default)\n")
 		parts[algorithm] = "MD5"
+	}
+
+	_, ok = parts[nonce]
+	if !ok {
+		return nil, fmt.Errorf("no nonce")
+	}
+
+	_, ok = parts[realm]
+	if !ok {
+		return nil, fmt.Errorf("no realm")
 	}
 
 	qval := parts[qop]
