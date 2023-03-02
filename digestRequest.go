@@ -162,11 +162,11 @@ func (r *DigestRequest) makeAuthorization(req *http.Request, parts map[string]st
 	var response string
 
 	switch strings.ToLower(parts[algorithm]) {
-	case "sha256":
+	case "sha-256":
 		ha1 := getSHA256([]string{r.username, parts[realm], r.password})
 		ha2 := getSHA256([]string{req.Method, req.URL.String()})
 		response = getSHA256([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
-	case "sha512":
+	case "sha-512":
 		ha1 := getSHA512([]string{r.username, parts[realm], r.password})
 		ha2 := getSHA512([]string{req.Method, req.URL.String()})
 		response = getSHA512([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
