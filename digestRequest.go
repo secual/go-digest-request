@@ -131,10 +131,12 @@ func (r *DigestRequest) makeParts(req *http.Request) (map[string]string, error) 
 	aval, ok := parts[algorithm]
 	if ok {
 
+		fmt.Printf("algorithm = %s\n", parts[algorithm])
 		if strings.HasSuffix(aval, "-sess") {
 			return nil, fmt.Errorf("not support session variant: %s", aval)
 		}
 	} else {
+		fmt.Printf("no algorithm(use default)\n")
 		parts[algorithm] = "MD5"
 	}
 
@@ -158,6 +160,7 @@ func (r *DigestRequest) makeAuthorization(req *http.Request, parts map[string]st
 	nc := r.getNonceCount()
 	var response string
 
+	fmt.Printf("algorithm(authorization) = %s\n", parts[algorithm])
 	switch strings.ToUpper(parts[algorithm]) {
 	case "SHA-256":
 		ha1 := getSHA256([]string{r.username, parts[realm], r.password})
