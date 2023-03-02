@@ -161,15 +161,15 @@ func (r *DigestRequest) makeAuthorization(req *http.Request, parts map[string]st
 	switch strings.ToUpper(parts[algorithm]) {
 	case "SHA-256":
 		ha1 := getSHA256([]string{r.username, parts[realm], r.password})
-		ha2 := getSHA256([]string{req.Method, req.URL.String()})
+		ha2 := getSHA256([]string{req.Method, req.URL.Path})
 		response = getSHA256([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
 	case "SHA-512":
 		ha1 := getSHA512([]string{r.username, parts[realm], r.password})
-		ha2 := getSHA512([]string{req.Method, req.URL.String()})
+		ha2 := getSHA512([]string{req.Method, req.URL.Path})
 		response = getSHA512([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
 	default:
 		ha1 := getMD5([]string{r.username, parts[realm], r.password})
-		ha2 := getMD5([]string{req.Method, req.URL.String()})
+		ha2 := getMD5([]string{req.Method, req.URL.Path})
 		response = getMD5([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
 	}
 
