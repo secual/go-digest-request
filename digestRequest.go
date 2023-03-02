@@ -134,16 +134,13 @@ func (r *DigestRequest) makeParts(req *http.Request) (map[string]string, error) 
 		if strings.HasSuffix(aval, "-sess") {
 			return nil, fmt.Errorf("not support session variant: %s", aval)
 		}
+	} else {
+		parts[algorithm] = "MD5"
 	}
 
 	qval := parts[qop]
 	if qval != "auth" {
 		return nil, fmt.Errorf("not support quality of protection: %s", qval)
-	}
-
-	_, ok = parts[algorithm]
-	if !ok {
-		parts[algorithm] = "MD5"
 	}
 
 	return parts, nil
@@ -161,12 +158,12 @@ func (r *DigestRequest) makeAuthorization(req *http.Request, parts map[string]st
 	nc := r.getNonceCount()
 	var response string
 
-	switch strings.ToLower(parts[algorithm]) {
-	case "sha-256":
+	switch strings.ToUpper(parts[algorithm]) {
+	case "SHA-256":
 		ha1 := getSHA256([]string{r.username, parts[realm], r.password})
 		ha2 := getSHA256([]string{req.Method, req.URL.String()})
 		response = getSHA256([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
-	case "sha-512":
+	case "SHA-512":
 		ha1 := getSHA512([]string{r.username, parts[realm], r.password})
 		ha2 := getSHA512([]string{req.Method, req.URL.String()})
 		response = getSHA512([]string{ha1, parts[nonce], nc, cnonce, parts[qop], ha2})
@@ -183,7 +180,7 @@ func (r *DigestRequest) makeAuthorization(req *http.Request, parts map[string]st
 			r.username,
 			parts[realm],
 			parts[nonce],
-			req.URL.String(),
+			req.URL.Path,
 			parts[algorithm],
 			parts[qop],
 			nc,
@@ -197,7 +194,7 @@ func (r *DigestRequest) makeAuthorization(req *http.Request, parts map[string]st
 		r.username,
 		parts[realm],
 		parts[nonce],
-		req.URL.String(),
+		req.URL.Path,
 		parts[algorithm],
 		parts[qop],
 		nc,
